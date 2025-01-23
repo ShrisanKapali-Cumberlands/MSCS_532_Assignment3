@@ -149,3 +149,110 @@ endTime = time.time()
 print("")
 print("Running deterministic quick sort on random sorted array of size 500000")
 print(f"Execution time: {endTime - startTime:.6f} seconds")
+
+
+## Implementing hash table using chaining to avoid collision
+# Defining a hash table class that has insert, search, and delete methods
+# Let us consider a class of products that has name as key and quanity as value
+# Universal Hasing using modular arithmentic
+# h(k)=((a⋅k+b)modp)modm => k=key, m=size
+class HashTable:
+    # Defining contructors
+    def __init__(self, size, primeNumber):
+        # Size is the number of has buckets
+        self.size = size
+        # Set the prime number
+        self.prime = primeNumber
+        # Get a and b value using random
+        self.a = random.randint(1, primeNumber - 1)
+        self.b = random.randint(0, primeNumber - 1)
+
+        # Iniializing a list of {size} empty lists
+        self.__table = [[] for _ in range(self.size)]
+
+    # A hash function to map key to values
+    def hash_function(self, key):
+        prime = 31
+        # simple rolling hash function using
+        key_int = sum(ord(c) * prime**i for i, c in enumerate(str(key))) % self.size
+
+        return ((self.a * key_int) % self.prime) % self.size
+
+    # a function to insert record
+    def insert_product(self, key, value):
+        index = self.hash_function(key)
+        for pair in self.__table[index]:
+            if pair[0] == key:
+                pair[1] = value  # Update existing key
+                return
+        self.__table[index].append([key, value])
+
+    # a function to search product using key
+    def search_product(self, key):
+        index = self.hash_function(key)
+        for pair in self.__table[index]:
+            if pair[0] == key:
+                return pair[1]
+
+        # If the key is not found
+        return None
+
+    # a function to delete product using key
+    def delete_product(self, key):
+        index = self.hash_function(key)
+
+        # If key is not in has table return
+        for i, pair in enumerate(self.__table[index]):
+            if pair[0] == key:
+                del self.__table[index][i]
+                return True
+        # If Key not found
+        return False
+
+
+# Now the hash table has been created, running test cases
+# Initializing hashtable of bucket size 10, and prime number 10000019 for reducing collision
+hash_table = HashTable(10, 10000019)
+
+# Inserting records in hash table
+print("")
+print("***************************************")
+print("Initializing HashTable")
+print("***************************************")
+startTime = time.time()
+hash_table.insert_product("calculator", 250.00)
+endTime = time.time()
+print(f"Execution time of inserting a calculator: {endTime - startTime:.6f} seconds")
+
+startTime = time.time()
+hash_table.insert_product("bottle", 35.00)
+endTime = time.time()
+print(f"Execution time of inserting a bottle: {endTime - startTime:.6f} seconds")
+
+hash_table.insert_product("pen", 2.50)
+hash_table.insert_product("earphone", 125.00)
+hash_table.insert_product("headphone", 299.00)
+
+# Searching for records in hash table
+print("")
+print("Searching value calculator in the HashTable")
+startTime = time.time()
+value = hash_table.search_product("calculator")
+endTime = time.time()
+print(
+    "Value of key calculator = "
+    + str(value)
+    + f". The search time took {endTime - startTime:.6f} seconds"
+)
+
+
+# Deleting  records in hash table
+print("Deleting calculator in a HashTable")
+startTime = time.time()
+hash_table.delete_product("calculator")
+endTime = time.time()
+print(f"Time taken to delete calculator: {endTime - startTime:.6f} seconds")
+print(
+    "Searching for the value of calculator after deletion: ",
+    hash_table.search_product("calculator"),
+)
